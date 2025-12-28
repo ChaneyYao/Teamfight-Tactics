@@ -1,0 +1,97 @@
+---
+title: "Patch 15.1b Internet Scraping"
+author: "Yao, Ju-Chien"
+date: '2025/8/2'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+```{r, message=FALSE}
+rm(list=ls())
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(purrr)
+```
+
+### Existing functions
+
+```{r}
+weighted_games_cal = function(places){
+  weighted_games = 0
+  for(i in 1:8){
+    weighted_games = weighted_games + i * places[i]
+  }
+  return(weighted_games)
+}
+
+avg_cal = function(places){
+  total_games = sum(places)
+  result = weighted_games_cal(places) / total_games
+  return(result)
+}
+
+winrate_cal = function(places){
+  result = places[1] / sum(places)
+  return(result)
+}
+
+frequency_cal = function(places){
+  return(sum(places) / number_of_all_games)
+}
+```
+
+### Setup
+
+```{r}
+url_metatft <- "https://api-hc.metatft.com/tft-stat-api/units?queue=1100&patch=current&days=3&rank=CHALLENGER,DIAMOND,GRANDMASTER,MASTER&permit_filter_adjustment=true"
+res_metatft <- GET(url_metatft)
+data <- fromJSON(content(res_metatft, as = "text", encoding = "UTF-8"))
+number_of_all_games = data$games$count
+
+### data of units
+units_data = data$results
+
+### changing the names
+cleaned_data = units_data[-33, ] %>%
+  mutate("clean_name" = sub("^TFT\\d+_", "", unit)) %>%
+  relocate("clean_name", .before = places) %>%
+  select(-unit)
+
+### using already-defined functions to construct dataframe
+processed_data = cleaned_data %>%
+    mutate(
+      clean_name = str_remove(clean_name, "^TFT\\d+_"),
+      avg_place = sapply(places, avg_cal),
+      winrate = sapply(places, winrate_cal),
+      frequency = sapply(places, frequency_cal)
+    ) %>%
+    select(-places)
+```
+
+### Plotting
+
+```{r}
+ggplot(processed_data, aes(x = frequency, y = avg_place)) + 
+  geom_point() + 
+  geom_hline(yintercept = 4.5, color = "red") + 
+  geom_text(aes(label = clean_name), hjust = -0.1, vjust = -0.5, size = 2.5)
+```
+
+### Items combined with units
+
+```{r}
+url_test = "https://api-hc.metatft.com/tft-comps-api/unit_items_processed"
+res_test = GET(url_test)
+data_test <- fromJSON(content(res_test, as = "text", encoding = "UTF-8"))
+
+test_units = data_test$units %>%
+  inner_join()
+  
+```
