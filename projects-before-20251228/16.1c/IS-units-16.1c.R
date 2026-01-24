@@ -7,10 +7,6 @@ url <- "https://api-hc.metatft.com/tft-comps-api/unit_items_processed"
 res <- GET(url)
 data <- fromJSON(content(res, as = "text", encoding = "UTF-8"))
 
-units = data$units
-
-str(units)
-
 units_df <- bind_rows(data$units) %>%
   select(unit, avg, pick) %>%
   mutate(unit = sub("^TFT\\d+_", "", unit)) %>%
