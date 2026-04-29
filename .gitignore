@@ -102,6 +102,7 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+
 # Chutzpah Test files
 _Chutzpah*
 
@@ -420,3 +421,6 @@ FodyWeavers.xsd
 *.sln.iml
 *.DS_Store
 .Rproj.user
+*.mp4
+*.jpg
+*.png

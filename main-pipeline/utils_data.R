@@ -25,8 +25,8 @@ scrape_tft_data <- function(patch_version, base_path) {
     unnest_wider(items) %>%
     filter(!is.na(item_1)) %>%
     select(-details) %>%
-    filter(str_detect(unit, "^TFT16")) %>%
-    mutate(unit = str_remove(unit, "TFT16_"))
+    filter(str_detect(unit, "^TFT17")) %>%
+    mutate(unit = str_remove(unit, "TFT17_"))
   
   # Save the file
   current_time <- format(Sys.time(), "%Y-%m-%d-%H%M")

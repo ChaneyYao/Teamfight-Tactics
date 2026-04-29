@@ -10,7 +10,7 @@ source(here("main-pipeline", "utils_data.R"))
 source(here("main-pipeline", "utils_viz.R"))
 
 # 3. Set Global Parameters
-PATCH <- "16.5"
+PATCH <- "17.2"
 # Use 'here' for directories too
 BASE_DIR <- here("data", "processed")
 PLOT_DIR <- file.path(BASE_DIR, "plots")
